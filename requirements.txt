@@ -4,3 +4,4 @@ scikit-learn
 numpy
 requests
 st-kaggle-connector
+pyarrow
