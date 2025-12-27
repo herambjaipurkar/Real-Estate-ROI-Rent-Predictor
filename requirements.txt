@@ -1,7 +1,5 @@
 streamlit
 pandas
 scikit-learn
-langchain
-langchain-google-genai
-pypdf
-faiss-cpu
+numpy
+requests
