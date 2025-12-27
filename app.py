@@ -17,8 +17,8 @@ def load_data():
         # Replace 'user/dataset-name' with the actual Kaggle path
         # Example: 'arnavsmayan/dubai-real-estate-transactions'
         df = conn.get(
-            path='arnavsmayan/dubai-real-estate-transactions', 
-            filename='dubai_transactions.csv'
+            path = kagglehub.dataset_download("alexefimik/dubai-real-estate-transactions-dataset"), 
+            filename='Transactions.csv'
         )
         return df
     except Exception as e:
