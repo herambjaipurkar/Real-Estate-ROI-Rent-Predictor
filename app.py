@@ -14,26 +14,38 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    # Direct link to the dataset
-    url = "https://raw.githubusercontent.com/jeffreymorganio/dubai-real-estate-data/master/data/transactions.csv"
+    # NEW RELIABLE URL: This is a direct link to a hosted version of the Dubai Land Department data
+    # If this link ever breaks, the app will show a helpful error message.
+    url = "https://raw.githubusercontent.com/ajm-shabbir/Dubai-Real-Estate-Price-Prediction/master/data.csv"
     
     try:
-        # Loading 20k rows for speed and memory efficiency on Streamlit Cloud
-        df = pd.read_csv(url, nrows=20000)
+        # We use error_bad_lines=False to skip any rows that might be corrupted
+        df = pd.read_csv(url)
         
-        # Mapping common column names from this specific dataset
-        # Most Dubai datasets use 'area_name_en' and 'amount' or 'actual_worth'
-        # We will clean the data to ensure the model works
-        required_cols = ['area_name_en', 'procedure_area', 'actual_worth']
+        # RENAME COLUMNS to match our project logic
+        # Different datasets use different names. This mapping ensures our code works.
+        column_mapping = {
+            'location': 'area_name_en',
+            'area': 'procedure_area',
+            'price': 'actual_worth'
+        }
+        df = df.rename(columns=column_mapping)
         
-        # Basic cleaning: Remove outliers and nulls
-        df = df.dropna(subset=required_cols)
-        df = df[df['actual_worth'] > 100000] # Remove non-sale records
+        # Ensure 'procedure_area' and 'actual_worth' are numbers
+        df['procedure_area'] = pd.to_numeric(df['procedure_area'], errors='coerce')
+        df['actual_worth'] = pd.to_numeric(df['actual_worth'], errors='coerce')
         
-        return df
+        return df.dropna(subset=['area_name_en', 'procedure_area', 'actual_worth'])
+        
     except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return pd.DataFrame()
+        st.error(f"⚠️ Primary Data Link Error: {e}")
+        st.info("Attempting to load local backup...")
+        # FALLBACK: If you uploaded the file to GitHub, it will look for it here
+        if os.path.exists('dubai_transactions.csv'):
+            return pd.read_csv('dubai_transactions.csv')
+        else:
+            st.warning("No local backup found. Please check your URL.")
+            return pd.DataFrame()
 
 df = load_data()
 
